@@ -2,57 +2,26 @@ import "./Services.css";
 
 function Services() {
   return (
-    <section className="services">
+    <section className="page">
+      <h1>Our Medical Services</h1>
+      <p>We provide world-class healthcare services.</p>
 
-      <div className="services-container">
-
-        <h2 className="section-title">
-          Our Medical Services
-        </h2>
-
-        <p className="section-description">
-          We provide world-class healthcare services with
-          experienced doctors and advanced medical technology.
-        </p>
-
-        <div className="services-grid">
-
-          <div className="service-card">
-            <div className="service-icon">🩺</div>
-            <h3>General Checkup</h3>
-            <p>
-              Regular health checkups for all age groups.
-            </p>
-          </div>
-
-          <div className="service-card">
-            <div className="service-icon">❤️</div>
-            <h3>Cardiology</h3>
-            <p>
-              Advanced heart care by expert cardiologists.
-            </p>
-          </div>
-
-          <div className="service-card">
-            <div className="service-icon">🦷</div>
-            <h3>Dental Care</h3>
-            <p>
-              Complete dental treatments with modern equipment.
-            </p>
-          </div>
-
-          <div className="service-card">
-            <div className="service-icon">🧠</div>
-            <h3>Neurology</h3>
-            <p>
-              Specialized neurological diagnosis and treatment.
-            </p>
-          </div>
-
+      <div className="doctor-list">
+        <div className="doctor-card">
+          <h3>General Checkup</h3>
+          <p>Complete health examination.</p>
         </div>
 
-      </div>
+        <div className="doctor-card">
+          <h3>Dental Care</h3>
+          <p>Advanced dental treatment.</p>
+        </div>
 
+        <div className="doctor-card">
+          <h3>Cardiology</h3>
+          <p>Heart specialist consultation.</p>
+        </div>
+      </div>
     </section>
   );
 }

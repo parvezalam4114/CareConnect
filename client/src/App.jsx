@@ -1,22 +1,23 @@
-import Navbar from "./components/Navbar";
-import Hero from "./components/Hero";
-import Services from "./components/Services";
-import Doctors from "./components/Doctors";
-import WhyChoose from "./components/WhyChoose";
-import Testimonials from "./components/Testimonials";
-import Footer from "./components/Footer";
+import { Routes, Route } from "react-router-dom";
+
+import Home from "./pages/Home";
+import Doctors from "./pages/Doctors";
+import Services from "./pages/Services";
+import About from "./pages/About";
+import Contact from "./pages/Contact";
+import NotFound from "./pages/NotFound";
 
 function App() {
   return (
-    <>
-      <Navbar />
-      <Hero />
-      <Services />
-      <Doctors />
-      <WhyChoose />
-      <Testimonials />
-      <Footer />
-    </>
+    <Routes>
+      <Route path="/" element={<Home />} />
+      <Route path="/doctors" element={<Doctors />} />
+      <Route path="/services" element={<Services />} />
+      <Route path="/about" element={<About />} />
+      <Route path="/contact" element={<Contact />} />
+
+      <Route path="*" element={<NotFound />} />
+    </Routes>
   );
 }
 

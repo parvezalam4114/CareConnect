@@ -1,4 +1,6 @@
-/* Why Choose Section */
+/* ===========================
+   Why Choose Section
+=========================== */
 
 .why-choose {
   padding: 80px 0;
@@ -7,42 +9,82 @@
 
 .why-container {
   max-width: 1200px;
-  margin: auto;
+  margin: 0 auto;
   padding: 0 40px;
   text-align: center;
 }
+
+/* Heading */
+
+.why-container h2 {
+  font-size: 38px;
+  color: #1e293b;
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+
+/* Paragraph */
+
+.why-container > p {
+  max-width: 700px;
+  margin: 0 auto 50px;
+  font-size: 17px;
+  color: #64748b;
+  line-height: 1.8;
+}
+
+/* Cards */
 
 .why-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 25px;
-  margin-top: 50px;
 }
 
 .why-card {
   background: #f8fbff;
   padding: 35px 25px;
   border-radius: 15px;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.08);
-  transition: 0.3s;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
   cursor: pointer;
 }
 
 .why-card:hover {
   transform: translateY(-8px);
-}
-
-.why-icon {
-  font-size: 45px;
-  margin-bottom: 20px;
+  box-shadow: 0 12px 25px rgba(37, 99, 235, 0.18);
 }
 
 .why-card h3 {
+  font-size: 22px;
   color: #1e293b;
   margin-bottom: 15px;
 }
 
 .why-card p {
+  font-size: 15px;
   color: #64748b;
   line-height: 1.6;
+}
+
+/* Responsive */
+
+@media (max-width: 992px) {
+  .why-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .why-container {
+    padding: 0 20px;
+  }
+
+  .why-container h2 {
+    font-size: 30px;
+  }
+
+  .why-grid {
+    grid-template-columns: 1fr;
+  }
 }

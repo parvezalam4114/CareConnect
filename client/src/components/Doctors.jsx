@@ -1,65 +1,97 @@
 import "./Doctors.css";
 
+import doctor1 from "../assets/doctors/doctor1.jpg";
+import doctor2 from "../assets/doctors/doctor2.jpg";
+import doctor3 from "../assets/doctors/doctor3.jpg";
+import doctor4 from "../assets/doctors/doctor4.jpg";
+import doctor5 from "../assets/doctors/doctor5.jpg";
+import doctor6 from "../assets/doctors/doctor6.jpg";
+
 function Doctors() {
+  const doctors = [
+    {
+      id: 1,
+      image: doctor1,
+      name: "Dr. Raj Sharma",
+      specialization: "Cardiologist",
+      experience: "10 Years",
+      rating: "⭐ 4.9",
+    },
+    {
+      id: 2,
+      image: doctor2,
+      name: "Dr. Neha Singh",
+      specialization: "Dentist",
+      experience: "8 Years",
+      rating: "⭐ 4.8",
+    },
+    {
+      id: 3,
+      image: doctor3,
+      name: "Dr. Amit Verma",
+      specialization: "Neurologist",
+      experience: "12 Years",
+      rating: "⭐ 4.9",
+    },
+    {
+      id: 4,
+      image: doctor4,
+      name: "Dr. Priya Kapoor",
+      specialization: "Dermatologist",
+      experience: "7 Years",
+      rating: "⭐ 4.7",
+    },
+    {
+      id: 5,
+      image: doctor5,
+      name: "Dr. Arjun Mehta",
+      specialization: "Orthopedic",
+      experience: "9 Years",
+      rating: "⭐ 4.8",
+    },
+    {
+      id: 6,
+      image: doctor6,
+      name: "Dr. Sneha Gupta",
+      specialization: "Pediatrician",
+      experience: "6 Years",
+      rating: "⭐ 4.9",
+    },
+  ];
+
   return (
-    <section className="doctors">
+    <section className="page">
+      <h1>Our Doctors</h1>
+      <p>Meet our experienced specialists.</p>
 
-      <div className="doctors-container">
-
-        <h2 className="section-title">
-          Meet Our Expert Doctors
-        </h2>
-
-        <p className="section-description">
-          Our experienced specialists are committed to providing
-          the highest quality healthcare services.
-        </p>
-
-        <div className="doctors-grid">
-
-          <div className="doctor-card">
+      <div className="doctor-list">
+        {doctors.map((doctor) => (
+          <div className="doctor-card" key={doctor.id}>
             <img
-              src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=500"
-              alt="Doctor"
+              src={doctor.image}
+              alt={doctor.name}
+              className="doctor-image"
             />
 
-            <h3>Dr. Sarah Johnson</h3>
+            <h3>{doctor.name}</h3>
 
-            <p>Cardiologist</p>
+            <p>{doctor.specialization}</p>
 
-            <span>⭐ 4.9</span>
+            <span>{doctor.experience}</span>
+
+            <br />
+
+            <span>{doctor.rating}</span>
+
+            <br />
+            <br />
+
+            <button className="book-btn">
+              Book Appointment
+            </button>
           </div>
-
-          <div className="doctor-card">
-            <img
-              src="https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=500"
-              alt="Doctor"
-            />
-
-            <h3>Dr. Michael Smith</h3>
-
-            <p>Neurologist</p>
-
-            <span>⭐ 4.8</span>
-          </div>
-
-          <div className="doctor-card">
-            <img
-              src="https://images.unsplash.com/photo-1594824476967-48c8b964273f?w=500"
-              alt="Doctor"
-            />
-
-            <h3>Dr. Emily Brown</h3>
-
-            <p>Dentist</p>
-
-            <span>⭐ 4.9</span>
-          </div>
-
-        </div>
-
+        ))}
       </div>
-
     </section>
   );
 }
