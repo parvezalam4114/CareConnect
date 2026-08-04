@@ -1,5 +1,6 @@
+import { useState } from "react";
 import "./Doctors.css";
-
+import { Link } from "react-router-dom";
 import doctor1 from "../assets/doctors/doctor1.jpg";
 import doctor2 from "../assets/doctors/doctor2.jpg";
 import doctor3 from "../assets/doctors/doctor3.jpg";
@@ -7,12 +8,18 @@ import doctor4 from "../assets/doctors/doctor4.jpg";
 import doctor5 from "../assets/doctors/doctor5.jpg";
 import doctor6 from "../assets/doctors/doctor6.jpg";
 
+import SearchBar from "./SearchBar";
+
 function Doctors() {
+
+  const [search, setSearch] = useState("");
+  const [department, setDepartment] = useState("All");
+
   const doctors = [
     {
       id: 1,
       image: doctor1,
-      name: "Dr. Raj Sharma",
+      name: "Dr. Neha Singh",
       specialization: "Cardiologist",
       experience: "10 Years",
       rating: "⭐ 4.9",
@@ -20,7 +27,7 @@ function Doctors() {
     {
       id: 2,
       image: doctor2,
-      name: "Dr. Neha Singh",
+      name: "Dr.Raj Sharma",
       specialization: "Dentist",
       experience: "8 Years",
       rating: "⭐ 4.8",
@@ -28,7 +35,7 @@ function Doctors() {
     {
       id: 3,
       image: doctor3,
-      name: "Dr. Amit Verma",
+      name: "Dr.Priya Kapoor",
       specialization: "Neurologist",
       experience: "12 Years",
       rating: "⭐ 4.9",
@@ -36,7 +43,7 @@ function Doctors() {
     {
       id: 4,
       image: doctor4,
-      name: "Dr. Priya Kapoor",
+      name: "Dr.  Amit Verma",
       specialization: "Dermatologist",
       experience: "7 Years",
       rating: "⭐ 4.7",
@@ -59,14 +66,37 @@ function Doctors() {
     },
   ];
 
+  const filteredDoctors = doctors.filter((doctor) => {
+    const matchName = doctor.name
+      .toLowerCase()
+      .includes(search.toLowerCase());
+
+    const matchDepartment =
+      department === "All" ||
+      doctor.specialization === department;
+
+    return matchName && matchDepartment;
+  });
+
   return (
     <section className="page">
+
       <h1>Our Doctors</h1>
+
       <p>Meet our experienced specialists.</p>
 
+      <SearchBar
+        search={search}
+        setSearch={setSearch}
+        department={department}
+        setDepartment={setDepartment}
+      />
+
       <div className="doctor-list">
-        {doctors.map((doctor) => (
+
+        {filteredDoctors.map((doctor) => (
           <div className="doctor-card" key={doctor.id}>
+
             <img
               src={doctor.image}
               alt={doctor.name}
@@ -79,19 +109,19 @@ function Doctors() {
 
             <span>{doctor.experience}</span>
 
-            <br />
-
             <span>{doctor.rating}</span>
 
-            <br />
-            <br />
+            <Link to="/appointment">
+               <button className="book-btn">
+                 Book Appointment
+               </button>
+            </Link>
 
-            <button className="book-btn">
-              Book Appointment
-            </button>
           </div>
         ))}
+
       </div>
+
     </section>
   );
 }

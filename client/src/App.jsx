@@ -1,5 +1,5 @@
 import { Routes, Route } from "react-router-dom";
-
+import Appointment from "./pages/Appointment";
 import Home from "./pages/Home";
 import Doctors from "./pages/Doctors";
 import Services from "./pages/Services";
@@ -10,6 +10,7 @@ import NotFound from "./pages/NotFound";
 function App() {
   return (
     <Routes>
+      <Route path="/appointment" element={<Appointment />} />
       <Route path="/" element={<Home />} />
       <Route path="/doctors" element={<Doctors />} />
       <Route path="/services" element={<Services />} />
