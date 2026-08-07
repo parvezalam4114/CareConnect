@@ -36,11 +36,19 @@ function Navbar() {
         </ul>
 
         {/* Buttons */}
-        <div className="navbar-buttons">
-          <button className="login-btn">Login</button>
-          <button className="register-btn">Register</button>
-        </div>
+       <div className="navbar-buttons">
+  <Link to="/login">
+    <button className="login-btn">
+      Login
+    </button>
+  </Link>
 
+  <Link to="/register">
+    <button className="register-btn">
+      Register
+    </button>
+  </Link>
+</div>
       </div>
     </nav>
   );
