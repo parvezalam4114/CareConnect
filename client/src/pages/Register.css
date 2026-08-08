@@ -102,3 +102,9 @@
   cursor: pointer;
   font-weight: 600;
 }
+.warning-text {
+  color: orange;
+  font-size: 14px;
+  margin-top: -10px;
+  margin-bottom: 10px;
+}

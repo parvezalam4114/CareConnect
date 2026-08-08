@@ -1,5 +1,5 @@
 import { Routes, Route } from "react-router-dom";
-
+import Dashboard from "./pages/Dashboard";
 import Home from "./pages/Home";
 import Doctors from "./pages/Doctors";
 import Services from "./pages/Services";
@@ -9,10 +9,13 @@ import Appointment from "./pages/Appointment";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import NotFound from "./pages/NotFound";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
   return (
     <Routes>
+      <Route path="/dashboard" element={<Dashboard />} />
+
       <Route path="/" element={<Home />} />
 
       <Route path="/doctors" element={<Doctors />} />
@@ -30,6 +33,15 @@ function App() {
       <Route path="/register" element={<Register />} />
 
       <Route path="*" element={<NotFound />} />
+
+      <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          }
+        />
     </Routes>
   );
 }
