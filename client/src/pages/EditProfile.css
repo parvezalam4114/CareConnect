@@ -1,0 +1,169 @@
+/* ============================= */
+/* Edit Profile Page */
+/* ============================= */
+
+.edit-profile-page {
+  min-height: 70vh;
+  padding: 70px 20px;
+  background: #f8fbff;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* ============================= */
+/* Edit Profile Card */
+/* ============================= */
+
+.edit-profile-card {
+  width: 100%;
+  max-width: 650px;
+
+  background: #ffffff;
+
+  padding: 40px;
+
+  border-radius: 18px;
+
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+}
+
+.edit-profile-card h1 {
+  margin: 0 0 10px;
+
+  color: #1e293b;
+
+  font-size: 30px;
+}
+
+.edit-profile-card > p {
+  margin-bottom: 30px;
+
+  color: #64748b;
+}
+
+/* ============================= */
+/* Form */
+/* ============================= */
+
+.edit-profile-card form {
+  display: flex;
+  flex-direction: column;
+}
+
+.edit-profile-card label {
+  margin-bottom: 8px;
+
+  color: #1e293b;
+
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.edit-profile-card input {
+  width: 100%;
+
+  box-sizing: border-box;
+
+  padding: 13px 15px;
+
+  margin-bottom: 20px;
+
+  border: 1px solid #cbd5e1;
+
+  border-radius: 8px;
+
+  font-size: 15px;
+
+  outline: none;
+
+  transition: 0.2s;
+}
+
+.edit-profile-card input:focus {
+  border-color: #2563eb;
+
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.edit-profile-card input:disabled {
+  background: #f1f5f9;
+
+  color: #64748b;
+
+  cursor: not-allowed;
+}
+
+/* ============================= */
+/* Buttons */
+/* ============================= */
+
+.edit-profile-actions {
+  display: flex;
+
+  gap: 15px;
+
+  margin-top: 10px;
+}
+
+.save-profile-btn,
+.cancel-profile-btn {
+  padding: 12px 22px;
+
+  border: none;
+
+  border-radius: 8px;
+
+  cursor: pointer;
+
+  font-weight: 600;
+
+  transition: 0.3s;
+}
+
+.save-profile-btn {
+  background: #2563eb;
+
+  color: #ffffff;
+}
+
+.cancel-profile-btn {
+  background: #e2e8f0;
+
+  color: #1e293b;
+}
+
+.save-profile-btn:hover,
+.cancel-profile-btn:hover {
+  transform: translateY(-2px);
+
+  opacity: 0.9;
+}
+
+/* ============================= */
+/* Mobile */
+/* ============================= */
+
+@media (max-width: 600px) {
+  .edit-profile-page {
+    padding: 40px 15px;
+  }
+
+  .edit-profile-card {
+    padding: 25px 20px;
+  }
+
+  .edit-profile-card h1 {
+    font-size: 24px;
+  }
+
+  .edit-profile-actions {
+    flex-direction: column;
+  }
+
+  .save-profile-btn,
+  .cancel-profile-btn {
+    width: 100%;
+  }
+}

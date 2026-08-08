@@ -36,6 +36,26 @@ function Appointment() {
       return;
     }
 
+    const savedAppointments =
+      localStorage.getItem("careConnectAppointments");
+
+    const appointments = savedAppointments
+      ? JSON.parse(savedAppointments)
+      : [];
+
+    const newAppointment = {
+      id: Date.now(),
+      ...formData,
+      status: "Confirmed",
+    };
+
+    appointments.push(newAppointment);
+
+    localStorage.setItem(
+      "careConnectAppointments",
+      JSON.stringify(appointments)
+    );
+
     alert("✅ Appointment Booked Successfully!");
 
     setFormData({
@@ -55,6 +75,7 @@ function Appointment() {
 
       <div className="appointment-page">
         <div className="appointment-container">
+
           <h1>Book an Appointment</h1>
 
           <p>
@@ -65,6 +86,7 @@ function Appointment() {
             className="appointment-form"
             onSubmit={handleSubmit}
           >
+            {/* Full Name */}
             <input
               type="text"
               name="name"
@@ -73,6 +95,7 @@ function Appointment() {
               onChange={handleChange}
             />
 
+            {/* Email */}
             <input
               type="email"
               name="email"
@@ -81,6 +104,7 @@ function Appointment() {
               onChange={handleChange}
             />
 
+            {/* Phone */}
             <input
               type="tel"
               name="phone"
@@ -89,6 +113,7 @@ function Appointment() {
               onChange={handleChange}
             />
 
+            {/* Department */}
             <select
               name="department"
               value={formData.department}
@@ -123,6 +148,7 @@ function Appointment() {
               </option>
             </select>
 
+            {/* Date */}
             <input
               type="date"
               name="date"
@@ -130,6 +156,7 @@ function Appointment() {
               onChange={handleChange}
             />
 
+            {/* Time */}
             <input
               type="time"
               name="time"
@@ -137,6 +164,7 @@ function Appointment() {
               onChange={handleChange}
             />
 
+            {/* Problem */}
             <textarea
               rows="5"
               name="message"
@@ -145,9 +173,11 @@ function Appointment() {
               onChange={handleChange}
             ></textarea>
 
+            {/* Submit */}
             <button type="submit">
               Book Appointment
             </button>
+
           </form>
         </div>
       </div>

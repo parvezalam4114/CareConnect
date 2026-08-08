@@ -10,11 +10,29 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/ProtectedRoute";
+import EditProfile from "./pages/EditProfile";
+import MyAppointments from "./pages/MyAppointments";
 
 function App() {
   return (
     <Routes>
       <Route path="/dashboard" element={<Dashboard />} />
+      <Route
+        path="/edit-profile"
+        element={
+          <ProtectedRoute>
+            <EditProfile />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/my-appointments"
+        element={
+          <ProtectedRoute>
+            <MyAppointments />
+          </ProtectedRoute>
+        }
+      />
 
       <Route path="/" element={<Home />} />
 
