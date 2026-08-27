@@ -8,7 +8,9 @@ function EditProfile() {
   const navigate = useNavigate();
 
   const savedUser = localStorage.getItem("careConnectUser");
-  const userData = savedUser ? JSON.parse(savedUser) : null;
+  const userData = savedUser
+    ? JSON.parse(savedUser)
+    : null;
 
   const [fullName, setFullName] = useState(
     userData?.fullName || ""
@@ -18,33 +20,92 @@ function EditProfile() {
     userData?.phone || ""
   );
 
-  const handleSave = (e) => {
+  const [message, setMessage] = useState("");
+  const [messageType, setMessageType] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleSave = async (e) => {
     e.preventDefault();
 
+    setMessage("");
+    setMessageType("");
+
     if (!fullName.trim()) {
-      alert("Please enter your full name.");
+      setMessage("❌ Please enter your full name.");
+      setMessageType("error");
       return;
     }
 
     if (!/^[6-9]\d{9}$/.test(phone)) {
-      alert("Please enter a valid 10-digit phone number.");
+      setMessage(
+        "❌ Please enter a valid 10-digit phone number."
+      );
+      setMessageType("error");
       return;
     }
 
-    const updatedUser = {
-      ...userData,
-      fullName: fullName,
-      phone: phone,
-    };
+    if (!userData?.id && !userData?._id) {
+      setMessage(
+        "❌ User information not found. Please login again."
+      );
+      setMessageType("error");
+      return;
+    }
 
-    localStorage.setItem(
-      "careConnectUser",
-      JSON.stringify(updatedUser)
-    );
+    try {
+      setLoading(true);
 
-    alert("Profile updated successfully! ✅");
+      const userId = userData.id || userData._id;
 
-    navigate("/dashboard");
+      const response = await fetch(
+        `http://localhost:5000/api/auth/profile/${userId}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            fullName: fullName.trim(),
+            phone: phone.trim(),
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setMessage(`❌ ${data.message}`);
+        setMessageType("error");
+        return;
+      }
+
+      // Update local user data
+      localStorage.setItem(
+        "careConnectUser",
+        JSON.stringify(data.user)
+      );
+
+      setMessage(
+        "✅ Profile updated successfully!"
+      );
+      setMessageType("success");
+
+      setTimeout(() => {
+        navigate("/dashboard");
+      }, 800);
+    } catch (error) {
+      console.error(
+        "Profile Update Error:",
+        error
+      );
+
+      setMessage(
+        "❌ Unable to connect to server."
+      );
+      setMessageType("error");
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (!userData) {
@@ -87,15 +148,19 @@ function EditProfile() {
 
           <form onSubmit={handleSave}>
 
+            {/* Full Name */}
             <label>Full Name</label>
 
             <input
               type="text"
               value={fullName}
-              onChange={(e) => setFullName(e.target.value)}
+              onChange={(e) =>
+                setFullName(e.target.value)
+              }
               placeholder="Enter your full name"
             />
 
+            {/* Email */}
             <label>Email Address</label>
 
             <input
@@ -104,28 +169,50 @@ function EditProfile() {
               disabled
             />
 
+            {/* Phone */}
             <label>Phone Number</label>
 
             <input
               type="tel"
               value={phone}
-              onChange={(e) => setPhone(e.target.value)}
+              onChange={(e) =>
+                setPhone(e.target.value)
+              }
               placeholder="Enter your phone number"
             />
 
+            {/* Message */}
+            {message && (
+              <p
+                className={
+                  messageType === "success"
+                    ? "success-text"
+                    : "error-text"
+                }
+              >
+                {message}
+              </p>
+            )}
+
+            {/* Buttons */}
             <div className="edit-profile-actions">
 
               <button
                 type="submit"
                 className="save-profile-btn"
+                disabled={loading}
               >
-                Save Changes
+                {loading
+                  ? "Saving..."
+                  : "Save Changes"}
               </button>
 
               <button
                 type="button"
                 className="cancel-profile-btn"
-                onClick={() => navigate("/dashboard")}
+                onClick={() =>
+                  navigate("/dashboard")
+                }
               >
                 Cancel
               </button>

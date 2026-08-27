@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
@@ -10,15 +10,40 @@ function Dashboard() {
   const savedUser = localStorage.getItem("careConnectUser");
   const userData = savedUser ? JSON.parse(savedUser) : null;
 
-  const [appointments] = useState(() => {
-    const savedAppointments = localStorage.getItem(
-      "careConnectAppointments"
-    );
+  const [appointments, setAppointments] = useState([]);
+  const [loadingAppointments, setLoadingAppointments] = useState(true);
 
-    return savedAppointments
-      ? JSON.parse(savedAppointments)
-      : [];
-  });
+  useEffect(() => {
+    const fetchAppointments = async () => {
+      try {
+        const userId = userData?.id || userData?._id;
+
+        if (!userId) {
+          setLoadingAppointments(false);
+          return;
+        }
+
+        const response = await fetch(
+          `http://localhost:5000/api/appointments/my/${userId}`
+        );
+
+        const data = await response.json();
+
+        if (response.ok) {
+          setAppointments(data.appointments || []);
+        }
+      } catch (error) {
+        console.error(
+          "Dashboard Appointment Error:",
+          error
+        );
+      } finally {
+        setLoadingAppointments(false);
+      }
+    };
+
+    fetchAppointments();
+  }, [userData?.id, userData?._id]);
 
   const handleLogout = () => {
     localStorage.removeItem("careConnectLoggedIn");
@@ -52,8 +77,15 @@ function Dashboard() {
   }
 
   const activeAppointments = appointments.filter(
-    (appointment) => appointment.status !== "Cancelled"
+    (appointment) =>
+      appointment.status !== "Cancelled"
   );
+
+  const doctorsVisited = new Set(
+    activeAppointments.map(
+      (appointment) => appointment.department
+    )
+  ).size;
 
   return (
     <>
@@ -62,9 +94,7 @@ function Dashboard() {
       <div className="dashboard-page">
         <div className="dashboard-container">
 
-          {/* ========================= */}
           {/* Welcome Section */}
-          {/* ========================= */}
 
           <div className="dashboard-header">
             <div>
@@ -85,9 +115,7 @@ function Dashboard() {
             </button>
           </div>
 
-          {/* ========================= */}
           {/* Quick Stats */}
-          {/* ========================= */}
 
           <div className="dashboard-stats">
 
@@ -98,7 +126,9 @@ function Dashboard() {
 
               <div>
                 <h3>
-                  {activeAppointments.length}
+                  {loadingAppointments
+                    ? "..."
+                    : activeAppointments.length}
                 </h3>
 
                 <p>
@@ -114,7 +144,9 @@ function Dashboard() {
 
               <div>
                 <h3>
-                  {activeAppointments.length}
+                  {loadingAppointments
+                    ? "..."
+                    : doctorsVisited}
                 </h3>
 
                 <p>
@@ -141,9 +173,7 @@ function Dashboard() {
 
           </div>
 
-          {/* ========================= */}
           {/* Profile Section */}
-          {/* ========================= */}
 
           <div className="dashboard-section">
 
@@ -197,9 +227,7 @@ function Dashboard() {
 
           </div>
 
-          {/* ========================= */}
           {/* Quick Actions */}
-          {/* ========================= */}
 
           <div className="dashboard-section">
 
@@ -208,8 +236,6 @@ function Dashboard() {
             </h2>
 
             <div className="quick-actions">
-
-              {/* Book Appointment */}
 
               <Link
                 to="/appointment"
@@ -228,9 +254,6 @@ function Dashboard() {
                 </p>
               </Link>
 
-
-              {/* My Appointments */}
-
               <Link
                 to="/my-appointments"
                 className="action-card"
@@ -248,9 +271,6 @@ function Dashboard() {
                 </p>
               </Link>
 
-
-              {/* Find Doctor */}
-
               <Link
                 to="/doctors"
                 className="action-card"
@@ -267,9 +287,6 @@ function Dashboard() {
                   Browse doctors and find the right specialist.
                 </p>
               </Link>
-
-
-              {/* Healthcare Services */}
 
               <Link
                 to="/services"

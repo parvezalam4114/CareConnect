@@ -8,36 +8,85 @@ function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState("");
 
+  const [loading, setLoading] = useState(false);
+
   const navigate = useNavigate();
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
 
-    const savedUser = localStorage.getItem("careConnectUser");
+    setMessage("");
+    setMessageType("");
 
-    if (!savedUser) {
-      setMessage(
-        "❌ No registered account found. Please register first."
-      );
+    if (!email.trim()) {
+      setMessage("❌ Please enter your email.");
       setMessageType("error");
       return;
     }
 
-    const userData = JSON.parse(savedUser);
-
-    if (
-      email === userData.email &&
-      password === userData.password
-    ) {
-      localStorage.setItem("careConnectLoggedIn", "true");
-
-      navigate("/dashboard");
-    } else {
-      setMessage("❌ Invalid email or password.");
+    if (!password) {
+      setMessage("❌ Please enter your password.");
       setMessageType("error");
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      const response = await fetch(
+        "http://localhost:5000/api/auth/login",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email: email.trim(),
+            password: password,
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setMessage(`❌ ${data.message}`);
+        setMessageType("error");
+        return;
+      }
+
+      // Save login state
+      localStorage.setItem(
+        "careConnectLoggedIn",
+        "true"
+      );
+
+      // Save user information
+      localStorage.setItem(
+        "careConnectUser",
+        JSON.stringify(data.user)
+      );
+
+      setMessage("✅ Login successful! Redirecting...");
+      setMessageType("success");
+
+      setTimeout(() => {
+        navigate("/dashboard");
+      }, 800);
+    } catch (error) {
+      console.error("Login Error:", error);
+
+      setMessage(
+        "❌ Unable to connect to server. Please try again."
+      );
+
+      setMessageType("error");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -63,10 +112,16 @@ function Login() {
             {/* Password */}
             <div className="password-box">
               <input
-                type={showPassword ? "text" : "password"}
+                type={
+                  showPassword
+                    ? "text"
+                    : "password"
+                }
                 placeholder="Enter Password"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e) =>
+                  setPassword(e.target.value)
+                }
               />
 
               <button
@@ -97,14 +152,19 @@ function Login() {
             <button
               type="submit"
               className="login-btn-page"
+              disabled={loading}
             >
-              Login
+              {loading
+                ? "Logging in..."
+                : "Login"}
             </button>
           </form>
 
           <p className="register-text">
             Don't have an account?{" "}
-            <Link to="/register">Register</Link>
+            <Link to="/register">
+              Register
+            </Link>
           </p>
         </div>
       </div>

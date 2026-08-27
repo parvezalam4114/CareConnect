@@ -4,15 +4,24 @@ import Footer from "../components/Footer";
 import "./Appointment.css";
 
 function Appointment() {
+  const savedUser = localStorage.getItem("careConnectUser");
+  const userData = savedUser
+    ? JSON.parse(savedUser)
+    : null;
+
   const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
+    name: userData?.fullName || "",
+    email: userData?.email || "",
+    phone: userData?.phone || "",
     department: "",
     date: "",
     time: "",
     message: "",
   });
+
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState("");
+  const [messageType, setMessageType] = useState("");
 
   const handleChange = (e) => {
     setFormData({
@@ -21,8 +30,19 @@ function Appointment() {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+
+    setMessage("");
+    setMessageType("");
+
+    if (!userData?._id && !userData?.id) {
+      setMessage(
+        "❌ User information not found. Please login again."
+      );
+      setMessageType("error");
+      return;
+    }
 
     if (
       !formData.name ||
@@ -32,41 +52,67 @@ function Appointment() {
       !formData.date ||
       !formData.time
     ) {
-      alert("Please fill all required fields!");
+      setMessage(
+        "❌ Please fill all required fields."
+      );
+      setMessageType("error");
       return;
     }
 
-    const savedAppointments =
-      localStorage.getItem("careConnectAppointments");
+    try {
+      setLoading(true);
 
-    const appointments = savedAppointments
-      ? JSON.parse(savedAppointments)
-      : [];
+      const userId = userData._id || userData.id;
 
-    const newAppointment = {
-      id: Date.now(),
-      ...formData,
-      status: "Confirmed",
-    };
+      const response = await fetch(
+        "http://localhost:5000/api/appointments",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            userId,
+            ...formData,
+          }),
+        }
+      );
 
-    appointments.push(newAppointment);
+      const data = await response.json();
 
-    localStorage.setItem(
-      "careConnectAppointments",
-      JSON.stringify(appointments)
-    );
+      if (!response.ok) {
+        setMessage(`❌ ${data.message}`);
+        setMessageType("error");
+        return;
+      }
 
-    alert("✅ Appointment Booked Successfully!");
+      setMessage(
+        "✅ Appointment Booked Successfully!"
+      );
+      setMessageType("success");
 
-    setFormData({
-      name: "",
-      email: "",
-      phone: "",
-      department: "",
-      date: "",
-      time: "",
-      message: "",
-    });
+      setFormData({
+        name: userData?.fullName || "",
+        email: userData?.email || "",
+        phone: userData?.phone || "",
+        department: "",
+        date: "",
+        time: "",
+        message: "",
+      });
+    } catch (error) {
+      console.error(
+        "Appointment Booking Error:",
+        error
+      );
+
+      setMessage(
+        "❌ Unable to connect to server. Please try again."
+      );
+      setMessageType("error");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -79,13 +125,15 @@ function Appointment() {
           <h1>Book an Appointment</h1>
 
           <p>
-            Fill in the details below to schedule your appointment.
+            Fill in the details below to schedule your
+            appointment.
           </p>
 
           <form
             className="appointment-form"
             onSubmit={handleSubmit}
           >
+
             {/* Full Name */}
             <input
               type="text"
@@ -171,11 +219,29 @@ function Appointment() {
               placeholder="Describe your problem..."
               value={formData.message}
               onChange={handleChange}
-            ></textarea>
+            />
+
+            {/* API Message */}
+            {message && (
+              <p
+                className={
+                  messageType === "success"
+                    ? "success-text"
+                    : "error-text"
+                }
+              >
+                {message}
+              </p>
+            )}
 
             {/* Submit */}
-            <button type="submit">
-              Book Appointment
+            <button
+              type="submit"
+              disabled={loading}
+            >
+              {loading
+                ? "Booking Appointment..."
+                : "Book Appointment"}
             </button>
 
           </form>

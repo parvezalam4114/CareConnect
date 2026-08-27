@@ -1,16 +1,22 @@
 import { useState } from "react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "./Register.css";
 
 function Register() {
+  const navigate = useNavigate();
+
   const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [email, setEmail] = useState("");
+
+  const [message, setMessage] = useState("");
+  const [messageType, setMessageType] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const getPasswordStrength = (password) => {
     if (password.length < 6) {
@@ -50,51 +56,95 @@ function Register() {
     };
   };
 
-  const handleRegister = (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
+
+    setMessage("");
+    setMessageType("");
 
     const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
     const phoneValid = /^[6-9]\d{9}$/.test(phone);
     const passwordsMatch = password === confirmPassword;
 
     if (!fullName.trim()) {
-      alert("Please enter your full name.");
+      setMessage("❌ Please enter your full name.");
+      setMessageType("error");
       return;
     }
 
     if (!emailValid) {
-      alert("Please enter a valid email address.");
+      setMessage("❌ Please enter a valid email address.");
+      setMessageType("error");
       return;
     }
 
     if (!phoneValid) {
-      alert("Please enter a valid 10-digit phone number.");
+      setMessage("❌ Please enter a valid 10-digit phone number.");
+      setMessageType("error");
       return;
     }
 
     if (password.length < 6) {
-      alert("Password must contain at least 6 characters.");
+      setMessage("❌ Password must contain at least 6 characters.");
+      setMessageType("error");
       return;
     }
 
     if (!passwordsMatch) {
-      alert("Passwords do not match.");
+      setMessage("❌ Passwords do not match.");
+      setMessageType("error");
       return;
     }
 
-    const userData = {
-      fullName: fullName,
-      email: email,
-      phone: phone,
-      password: password,
-    };
+    try {
+      setLoading(true);
 
-    localStorage.setItem(
-      "careConnectUser",
-      JSON.stringify(userData)
-    );
+      const response = await fetch(
+        "http://localhost:5000/api/auth/register",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            fullName: fullName.trim(),
+            email: email.trim(),
+            phone: phone.trim(),
+            password,
+          }),
+        }
+      );
 
-    alert("Registration successful! 🎉");
+      const data = await response.json();
+
+      if (!response.ok) {
+        setMessage(`❌ ${data.message}`);
+        setMessageType("error");
+        return;
+      }
+
+      setMessage("✅ Registration successful! Redirecting to login...");
+      setMessageType("success");
+
+      setFullName("");
+      setEmail("");
+      setPhone("");
+      setPassword("");
+      setConfirmPassword("");
+
+      setTimeout(() => {
+        navigate("/login");
+      }, 1500);
+    } catch (error) {
+      console.error("Registration Error:", error);
+
+      setMessage(
+        "❌ Unable to connect to server. Please try again."
+      );
+      setMessageType("error");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -230,12 +280,28 @@ function Register() {
               </p>
             )}
 
+            {/* API Message */}
+            {message && (
+              <p
+                className={
+                  messageType === "success"
+                    ? "success-text"
+                    : "error-text"
+                }
+              >
+                {message}
+              </p>
+            )}
+
             {/* Register Button */}
             <button
               type="submit"
               className="register-btn-page"
+              disabled={loading}
             >
-              Create Account
+              {loading
+                ? "Creating Account..."
+                : "Create Account"}
             </button>
           </form>
 

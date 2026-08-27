@@ -1,4 +1,5 @@
 import { Routes, Route } from "react-router-dom";
+
 import Dashboard from "./pages/Dashboard";
 import Home from "./pages/Home";
 import Doctors from "./pages/Doctors";
@@ -9,30 +10,19 @@ import Appointment from "./pages/Appointment";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import NotFound from "./pages/NotFound";
+
 import ProtectedRoute from "./components/ProtectedRoute";
+
 import EditProfile from "./pages/EditProfile";
 import MyAppointments from "./pages/MyAppointments";
 
 function App() {
   return (
     <Routes>
-      <Route path="/dashboard" element={<Dashboard />} />
-      <Route
-        path="/edit-profile"
-        element={
-          <ProtectedRoute>
-            <EditProfile />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/my-appointments"
-        element={
-          <ProtectedRoute>
-            <MyAppointments />
-          </ProtectedRoute>
-        }
-      />
+
+      {/* =========================
+          PUBLIC ROUTES
+      ========================= */}
 
       <Route path="/" element={<Home />} />
 
@@ -44,22 +34,58 @@ function App() {
 
       <Route path="/contact" element={<Contact />} />
 
-      <Route path="/appointment" element={<Appointment />} />
-
       <Route path="/login" element={<Login />} />
 
       <Route path="/register" element={<Register />} />
 
-      <Route path="*" element={<NotFound />} />
+
+      {/* =========================
+          PROTECTED ROUTES
+      ========================= */}
 
       <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute>
-              <Dashboard />
-            </ProtectedRoute>
-          }
-        />
+        path="/dashboard"
+        element={
+          <ProtectedRoute>
+            <Dashboard />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/appointment"
+        element={
+          <ProtectedRoute>
+            <Appointment />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/edit-profile"
+        element={
+          <ProtectedRoute>
+            <EditProfile />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/my-appointments"
+        element={
+          <ProtectedRoute>
+            <MyAppointments />
+          </ProtectedRoute>
+        }
+      />
+
+
+      {/* =========================
+          404 ROUTE
+      ========================= */}
+
+      <Route path="*" element={<NotFound />} />
+
     </Routes>
   );
 }

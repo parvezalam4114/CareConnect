@@ -1,45 +1,49 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import "./MyAppointments.css";
 
 function MyAppointments() {
-  const [appointments, setAppointments] = useState(() => {
-    const savedAppointments = localStorage.getItem(
-      "careConnectAppointments"
-    );
+  const savedUser = localStorage.getItem("careConnectUser");
+  const userData = savedUser ? JSON.parse(savedUser) : null;
 
-    return savedAppointments
-      ? JSON.parse(savedAppointments)
-      : [];
-  });
+  const [appointments, setAppointments] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  const handleCancel = (id) => {
-    const confirmCancel = window.confirm(
-      "Are you sure you want to cancel this appointment?"
-    );
+  useEffect(() => {
+    const fetchAppointments = async () => {
+      try {
+        const userId = userData?.id || userData?._id;
 
-    if (!confirmCancel) {
-      return;
-    }
+        if (!userId) {
+          setError("User information not found.");
+          setLoading(false);
+          return;
+        }
 
-    const updatedAppointments = appointments.map((appointment) =>
-      appointment.id === id
-        ? {
-            ...appointment,
-            status: "Cancelled",
-          }
-        : appointment
-    );
+        const response = await fetch(
+          `http://localhost:5000/api/appointments/my/${userId}`
+        );
 
-    setAppointments(updatedAppointments);
+        const data = await response.json();
 
-    localStorage.setItem(
-      "careConnectAppointments",
-      JSON.stringify(updatedAppointments)
-    );
-  };
+        if (!response.ok) {
+          setError(data.message || "Unable to fetch appointments.");
+          return;
+        }
+
+        setAppointments(data.appointments || []);
+      } catch (error) {
+        console.error("Fetch Appointments Error:", error);
+        setError("Unable to connect to server.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAppointments();
+  }, [userData?.id, userData?._id]);
 
   return (
     <>
@@ -48,139 +52,93 @@ function MyAppointments() {
       <div className="my-appointments-page">
         <div className="my-appointments-container">
 
-          <div className="appointments-header">
-            <div>
-              <h1>My Appointments 📅</h1>
+          <h1>My Appointments 📅</h1>
 
-              <p>
-                View and manage your CareConnect appointments.
-              </p>
-            </div>
+          <p>
+            View and manage your booked appointments.
+          </p>
 
-            <Link to="/appointment">
-              <button className="book-new-btn">
-                + Book New Appointment
-              </button>
-            </Link>
-          </div>
-
-          {appointments.length === 0 ? (
-            <div className="no-appointments">
-              <div className="empty-icon">
-                📅
-              </div>
-
-              <h2>No Appointments Found</h2>
-
-              <p>
-                You haven't booked any appointments yet.
-              </p>
-
-              <Link to="/appointment">
-                <button className="dashboard-btn">
-                  Book an Appointment
-                </button>
-              </Link>
-            </div>
-          ) : (
-            <div className="appointments-list">
-
-              {appointments.map((appointment) => (
-                <div
-                  className="appointment-card"
-                  key={appointment.id}
-                >
-
-                  <div className="appointment-card-header">
-
-                    <div>
-                      <h2>
-                        {appointment.department}
-                      </h2>
-
-                      <p>
-                        Appointment ID: #{appointment.id}
-                      </p>
-                    </div>
-
-                    <span
-                      className={
-                        appointment.status === "Cancelled"
-                          ? "status cancelled"
-                          : "status confirmed"
-                      }
-                    >
-                      {appointment.status === "Cancelled"
-                        ? "❌ Cancelled"
-                        : "✅ Confirmed"}
-                    </span>
-
-                  </div>
-
-                  <div className="appointment-details">
-
-                    <div className="appointment-detail">
-                      <span>👤 Patient</span>
-                      <strong>{appointment.name}</strong>
-                    </div>
-
-                    <div className="appointment-detail">
-                      <span>📧 Email</span>
-                      <strong>{appointment.email}</strong>
-                    </div>
-
-                    <div className="appointment-detail">
-                      <span>📱 Phone</span>
-                      <strong>{appointment.phone}</strong>
-                    </div>
-
-                    <div className="appointment-detail">
-                      <span>📅 Date</span>
-                      <strong>{appointment.date}</strong>
-                    </div>
-
-                    <div className="appointment-detail">
-                      <span>⏰ Time</span>
-                      <strong>{appointment.time}</strong>
-                    </div>
-
-                    <div className="appointment-detail">
-                      <span>🏥 Department</span>
-                      <strong>{appointment.department}</strong>
-                    </div>
-
-                  </div>
-
-                  {appointment.message && (
-                    <div className="appointment-message">
-                      <span>📝 Problem Description</span>
-
-                      <p>
-                        {appointment.message}
-                      </p>
-                    </div>
-                  )}
-
-                  {appointment.status !== "Cancelled" && (
-                    <div className="appointment-actions">
-
-                      <button
-                        className="cancel-btn"
-                        onClick={() =>
-                          handleCancel(appointment.id)
-                        }
-                      >
-                        Cancel Appointment
-                      </button>
-
-                    </div>
-                  )}
-
-                </div>
-              ))}
-
+          {loading && (
+            <div className="appointment-message">
+              Loading appointments...
             </div>
           )}
+
+          {error && (
+            <div className="appointment-message error-text">
+              ❌ {error}
+            </div>
+          )}
+
+          {!loading &&
+            !error &&
+            appointments.length === 0 && (
+              <div className="appointment-message">
+                <h2>No Appointments Found</h2>
+                <p>
+                  You haven't booked any appointments yet.
+                </p>
+              </div>
+            )}
+
+          {!loading &&
+            !error &&
+            appointments.length > 0 && (
+              <div className="appointments-list">
+
+                {appointments.map((appointment) => (
+                  <div
+                    className="appointment-card"
+                    key={appointment._id}
+                  >
+                    <div className="appointment-card-header">
+                      <h2>{appointment.department}</h2>
+
+                      <span className="appointment-status">
+                        {appointment.status}
+                      </span>
+                    </div>
+
+                    <div className="appointment-details">
+
+                      <p>
+                        <strong>👤 Name:</strong>{" "}
+                        {appointment.name}
+                      </p>
+
+                      <p>
+                        <strong>📧 Email:</strong>{" "}
+                        {appointment.email}
+                      </p>
+
+                      <p>
+                        <strong>📱 Phone:</strong>{" "}
+                        {appointment.phone}
+                      </p>
+
+                      <p>
+                        <strong>📅 Date:</strong>{" "}
+                        {appointment.date}
+                      </p>
+
+                      <p>
+                        <strong>⏰ Time:</strong>{" "}
+                        {appointment.time}
+                      </p>
+
+                      {appointment.message && (
+                        <p>
+                          <strong>📝 Problem:</strong>{" "}
+                          {appointment.message}
+                        </p>
+                      )}
+
+                    </div>
+                  </div>
+                ))}
+
+              </div>
+            )}
 
         </div>
       </div>
