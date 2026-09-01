@@ -20,7 +20,7 @@ function MyAppointments() {
         }
 
         const response = await fetch(
-          "http://localhost:5000/api/appointments/my",
+          "https://careconnect-vvwz.onrender.com/api/appointments/my",
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -65,7 +65,7 @@ function MyAppointments() {
 
     try {
       const response = await fetch(
-        `http://localhost:5000/api/appointments/cancel/${id}`,
+        `https://careconnect-vvwz.onrender.com/api/appointments/cancel/${id}`,
         {
           method: "PUT",
           headers: {

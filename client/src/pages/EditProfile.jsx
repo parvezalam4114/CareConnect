@@ -71,7 +71,7 @@ function EditProfile() {
       const userId = userData.id || userData._id;
 
       const response = await fetch(
-        `http://localhost:5000/api/auth/profile/${userId}`,
+        `https://careconnect-vvwz.onrender.com/api/auth/profile/${userId}`,
         {
           method: "PUT",
 

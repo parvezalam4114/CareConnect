@@ -29,7 +29,7 @@ function Dashboard() {
         }
 
         const response = await fetch(
-          `http://localhost:5000/api/appointments/my/${userId}`
+          `https://careconnect-vvwz.onrender.com/api/appointments/my/${userId}`
         );
 
         const data = await response.json();
