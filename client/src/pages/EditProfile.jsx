@@ -8,9 +8,7 @@ function EditProfile() {
   const navigate = useNavigate();
 
   const savedUser = localStorage.getItem("careConnectUser");
-  const userData = savedUser
-    ? JSON.parse(savedUser)
-    : null;
+  const userData = savedUser ? JSON.parse(savedUser) : null;
 
   const [fullName, setFullName] = useState(
     userData?.fullName || ""
@@ -44,6 +42,21 @@ function EditProfile() {
       return;
     }
 
+    const token = localStorage.getItem("careConnectToken");
+
+    if (!token) {
+      setMessage(
+        "❌ Session expired. Please login again."
+      );
+      setMessageType("error");
+
+      setTimeout(() => {
+        navigate("/login");
+      }, 1000);
+
+      return;
+    }
+
     if (!userData?.id && !userData?._id) {
       setMessage(
         "❌ User information not found. Please login again."
@@ -61,9 +74,12 @@ function EditProfile() {
         `http://localhost:5000/api/auth/profile/${userId}`,
         {
           method: "PUT",
+
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
           },
+
           body: JSON.stringify({
             fullName: fullName.trim(),
             phone: phone.trim(),
@@ -74,12 +90,13 @@ function EditProfile() {
       const data = await response.json();
 
       if (!response.ok) {
-        setMessage(`❌ ${data.message}`);
+        setMessage(
+          `❌ ${data.message || "Unable to update profile."}`
+        );
         setMessageType("error");
         return;
       }
 
-      // Update local user data
       localStorage.setItem(
         "careConnectUser",
         JSON.stringify(data.user)
@@ -94,10 +111,7 @@ function EditProfile() {
         navigate("/dashboard");
       }, 800);
     } catch (error) {
-      console.error(
-        "Profile Update Error:",
-        error
-      );
+      console.error("Profile Update Error:", error);
 
       setMessage(
         "❌ Unable to connect to server."
@@ -148,7 +162,6 @@ function EditProfile() {
 
           <form onSubmit={handleSave}>
 
-            {/* Full Name */}
             <label>Full Name</label>
 
             <input
@@ -160,7 +173,6 @@ function EditProfile() {
               placeholder="Enter your full name"
             />
 
-            {/* Email */}
             <label>Email Address</label>
 
             <input
@@ -169,7 +181,6 @@ function EditProfile() {
               disabled
             />
 
-            {/* Phone */}
             <label>Phone Number</label>
 
             <input
@@ -181,7 +192,6 @@ function EditProfile() {
               placeholder="Enter your phone number"
             />
 
-            {/* Message */}
             {message && (
               <p
                 className={
@@ -194,7 +204,6 @@ function EditProfile() {
               </p>
             )}
 
-            {/* Buttons */}
             <div className="edit-profile-actions">
 
               <button

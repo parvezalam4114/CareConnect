@@ -4,9 +4,6 @@ import Footer from "../components/Footer";
 import "./MyAppointments.css";
 
 function MyAppointments() {
-  const savedUser = localStorage.getItem("careConnectUser");
-  const userData = savedUser ? JSON.parse(savedUser) : null;
-
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -14,22 +11,29 @@ function MyAppointments() {
   useEffect(() => {
     const fetchAppointments = async () => {
       try {
-        const userId = userData?.id || userData?._id;
+        const token = localStorage.getItem("careConnectToken");
 
-        if (!userId) {
-          setError("User information not found.");
+        if (!token) {
+          setError("Please login first.");
           setLoading(false);
           return;
         }
 
         const response = await fetch(
-          `http://localhost:5000/api/appointments/my/${userId}`
+          "http://localhost:5000/api/appointments/my",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
         );
 
         const data = await response.json();
 
         if (!response.ok) {
-          setError(data.message || "Unable to fetch appointments.");
+          setError(
+            data.message || "Unable to fetch appointments."
+          );
           return;
         }
 
@@ -43,7 +47,57 @@ function MyAppointments() {
     };
 
     fetchAppointments();
-  }, [userData?.id, userData?._id]);
+  }, []);
+
+  const handleCancel = async (id) => {
+    const token = localStorage.getItem("careConnectToken");
+
+    if (!token) {
+      setError("Please login first.");
+      return;
+    }
+
+    const confirmCancel = window.confirm(
+      "Are you sure you want to cancel this appointment?"
+    );
+
+    if (!confirmCancel) return;
+
+    try {
+      const response = await fetch(
+        `http://localhost:5000/api/appointments/cancel/${id}`,
+        {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        alert(data.message || "Unable to cancel appointment.");
+        return;
+      }
+
+      setAppointments((prev) =>
+        prev.map((appointment) =>
+          appointment._id === id
+            ? {
+                ...appointment,
+                status: "Cancelled",
+              }
+            : appointment
+        )
+      );
+
+      alert("Appointment cancelled successfully. ✅");
+    } catch (error) {
+      console.error("Cancel Appointment Error:", error);
+      alert("Unable to connect to server.");
+    }
+  };
 
   return (
     <>
@@ -91,12 +145,17 @@ function MyAppointments() {
                     className="appointment-card"
                     key={appointment._id}
                   >
+
                     <div className="appointment-card-header">
-                      <h2>{appointment.department}</h2>
+
+                      <h2>
+                        {appointment.department}
+                      </h2>
 
                       <span className="appointment-status">
                         {appointment.status}
                       </span>
+
                     </div>
 
                     <div className="appointment-details">
@@ -134,6 +193,17 @@ function MyAppointments() {
                       )}
 
                     </div>
+
+                    {appointment.status !== "Cancelled" && (
+                      <button
+                        onClick={() =>
+                          handleCancel(appointment._id)
+                        }
+                      >
+                        Cancel Appointment
+                      </button>
+                    )}
+
                   </div>
                 ))}
 

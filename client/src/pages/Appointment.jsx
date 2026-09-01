@@ -1,18 +1,16 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import "./Appointment.css";
 
 function Appointment() {
-  const savedUser = localStorage.getItem("careConnectUser");
-  const userData = savedUser
-    ? JSON.parse(savedUser)
-    : null;
+  const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
-    name: userData?.fullName || "",
-    email: userData?.email || "",
-    phone: userData?.phone || "",
+    name: "",
+    email: "",
+    phone: "",
     department: "",
     date: "",
     time: "",
@@ -20,8 +18,6 @@ function Appointment() {
   });
 
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState("");
-  const [messageType, setMessageType] = useState("");
 
   const handleChange = (e) => {
     setFormData({
@@ -33,17 +29,6 @@ function Appointment() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    setMessage("");
-    setMessageType("");
-
-    if (!userData?._id && !userData?.id) {
-      setMessage(
-        "❌ User information not found. Please login again."
-      );
-      setMessageType("error");
-      return;
-    }
-
     if (
       !formData.name ||
       !formData.email ||
@@ -52,64 +37,59 @@ function Appointment() {
       !formData.date ||
       !formData.time
     ) {
-      setMessage(
-        "❌ Please fill all required fields."
-      );
-      setMessageType("error");
+      alert("Please fill all required fields!");
+      return;
+    }
+
+    const token = localStorage.getItem("careConnectToken");
+
+    if (!token) {
+      alert("Please login first.");
+      navigate("/login");
       return;
     }
 
     try {
       setLoading(true);
 
-      const userId = userData._id || userData.id;
-
       const response = await fetch(
         "http://localhost:5000/api/appointments",
         {
           method: "POST",
+
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify({
-            userId,
-            ...formData,
-          }),
+
+          body: JSON.stringify(formData),
         }
       );
 
       const data = await response.json();
 
       if (!response.ok) {
-        setMessage(`❌ ${data.message}`);
-        setMessageType("error");
+        alert(data.message || "Unable to book appointment.");
         return;
       }
 
-      setMessage(
-        "✅ Appointment Booked Successfully!"
-      );
-      setMessageType("success");
+      alert("✅ Appointment Booked Successfully!");
 
       setFormData({
-        name: userData?.fullName || "",
-        email: userData?.email || "",
-        phone: userData?.phone || "",
+        name: "",
+        email: "",
+        phone: "",
         department: "",
         date: "",
         time: "",
         message: "",
       });
-    } catch (error) {
-      console.error(
-        "Appointment Booking Error:",
-        error
-      );
 
-      setMessage(
-        "❌ Unable to connect to server. Please try again."
-      );
-      setMessageType("error");
+      navigate("/my-appointments");
+    } catch (error) {
+      console.error("Appointment Error:", error);
+
+      alert("Unable to connect to server.");
     } finally {
       setLoading(false);
     }
@@ -125,8 +105,7 @@ function Appointment() {
           <h1>Book an Appointment</h1>
 
           <p>
-            Fill in the details below to schedule your
-            appointment.
+            Fill in the details below to schedule your appointment.
           </p>
 
           <form
@@ -135,6 +114,7 @@ function Appointment() {
           >
 
             {/* Full Name */}
+
             <input
               type="text"
               name="name"
@@ -144,6 +124,7 @@ function Appointment() {
             />
 
             {/* Email */}
+
             <input
               type="email"
               name="email"
@@ -153,6 +134,7 @@ function Appointment() {
             />
 
             {/* Phone */}
+
             <input
               type="tel"
               name="phone"
@@ -162,6 +144,7 @@ function Appointment() {
             />
 
             {/* Department */}
+
             <select
               name="department"
               value={formData.department}
@@ -197,6 +180,7 @@ function Appointment() {
             </select>
 
             {/* Date */}
+
             <input
               type="date"
               name="date"
@@ -205,6 +189,7 @@ function Appointment() {
             />
 
             {/* Time */}
+
             <input
               type="time"
               name="time"
@@ -213,6 +198,7 @@ function Appointment() {
             />
 
             {/* Problem */}
+
             <textarea
               rows="5"
               name="message"
@@ -221,30 +207,19 @@ function Appointment() {
               onChange={handleChange}
             />
 
-            {/* API Message */}
-            {message && (
-              <p
-                className={
-                  messageType === "success"
-                    ? "success-text"
-                    : "error-text"
-                }
-              >
-                {message}
-              </p>
-            )}
-
             {/* Submit */}
+
             <button
               type="submit"
               disabled={loading}
             >
               {loading
-                ? "Booking Appointment..."
+                ? "Booking..."
                 : "Book Appointment"}
             </button>
 
           </form>
+
         </div>
       </div>
 

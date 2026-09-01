@@ -11,7 +11,12 @@ function Dashboard() {
   const userData = savedUser ? JSON.parse(savedUser) : null;
 
   const [appointments, setAppointments] = useState([]);
-  const [loadingAppointments, setLoadingAppointments] = useState(true);
+  const [loadingAppointments, setLoadingAppointments] =
+    useState(true);
+
+  // ==============================
+  // FETCH APPOINTMENTS FROM MONGODB
+  // ==============================
 
   useEffect(() => {
     const fetchAppointments = async () => {
@@ -34,7 +39,7 @@ function Dashboard() {
         }
       } catch (error) {
         console.error(
-          "Dashboard Appointment Error:",
+          "Dashboard Appointments Error:",
           error
         );
       } finally {
@@ -45,10 +50,18 @@ function Dashboard() {
     fetchAppointments();
   }, [userData?.id, userData?._id]);
 
+  // ==============================
+  // LOGOUT
+  // ==============================
+
   const handleLogout = () => {
     localStorage.removeItem("careConnectLoggedIn");
     navigate("/login");
   };
+
+  // ==============================
+  // USER NOT FOUND
+  // ==============================
 
   if (!userData) {
     return (
@@ -76,12 +89,21 @@ function Dashboard() {
     );
   }
 
+  // ==============================
+  // APPOINTMENT STATISTICS
+  // ==============================
+
   const activeAppointments = appointments.filter(
-    (appointment) =>
-      appointment.status !== "Cancelled"
+    (appointment) => appointment.status !== "Cancelled"
   );
 
-  const doctorsVisited = new Set(
+  const cancelledAppointments = appointments.filter(
+    (appointment) => appointment.status === "Cancelled"
+  );
+
+  const totalAppointments = appointments.length;
+
+  const departmentsVisited = new Set(
     activeAppointments.map(
       (appointment) => appointment.department
     )
@@ -94,7 +116,9 @@ function Dashboard() {
       <div className="dashboard-page">
         <div className="dashboard-container">
 
+          {/* ========================= */}
           {/* Welcome Section */}
+          {/* ========================= */}
 
           <div className="dashboard-header">
             <div>
@@ -115,9 +139,13 @@ function Dashboard() {
             </button>
           </div>
 
+          {/* ========================= */}
           {/* Quick Stats */}
+          {/* ========================= */}
 
           <div className="dashboard-stats">
+
+            {/* Total Appointments */}
 
             <div className="stat-card">
               <div className="stat-icon">
@@ -128,14 +156,56 @@ function Dashboard() {
                 <h3>
                   {loadingAppointments
                     ? "..."
+                    : totalAppointments}
+                </h3>
+
+                <p>
+                  Total Appointments
+                </p>
+              </div>
+            </div>
+
+            {/* Confirmed Appointments */}
+
+            <div className="stat-card">
+              <div className="stat-icon">
+                ✅
+              </div>
+
+              <div>
+                <h3>
+                  {loadingAppointments
+                    ? "..."
                     : activeAppointments.length}
                 </h3>
 
                 <p>
-                  Appointments
+                  Active Appointments
                 </p>
               </div>
             </div>
+
+            {/* Cancelled Appointments */}
+
+            <div className="stat-card">
+              <div className="stat-icon">
+                ❌
+              </div>
+
+              <div>
+                <h3>
+                  {loadingAppointments
+                    ? "..."
+                    : cancelledAppointments.length}
+                </h3>
+
+                <p>
+                  Cancelled
+                </p>
+              </div>
+            </div>
+
+            {/* Departments */}
 
             <div className="stat-card">
               <div className="stat-icon">
@@ -146,34 +216,20 @@ function Dashboard() {
                 <h3>
                   {loadingAppointments
                     ? "..."
-                    : doctorsVisited}
+                    : departmentsVisited}
                 </h3>
 
                 <p>
-                  Doctors Visited
-                </p>
-              </div>
-            </div>
-
-            <div className="stat-card">
-              <div className="stat-icon">
-                ❤️
-              </div>
-
-              <div>
-                <h3>
-                  Active
-                </h3>
-
-                <p>
-                  Health Status
+                  Departments
                 </p>
               </div>
             </div>
 
           </div>
 
+          {/* ========================= */}
           {/* Profile Section */}
+          {/* ========================= */}
 
           <div className="dashboard-section">
 
@@ -227,7 +283,9 @@ function Dashboard() {
 
           </div>
 
+          {/* ========================= */}
           {/* Quick Actions */}
+          {/* ========================= */}
 
           <div className="dashboard-section">
 

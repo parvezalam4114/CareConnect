@@ -1,5 +1,6 @@
 const express = require("express");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 
 const router = express.Router();
@@ -17,7 +18,11 @@ router.post("/register", async (req, res) => {
       });
     }
 
-    const existingUser = await User.findOne({ email });
+    const normalizedEmail = email.toLowerCase().trim();
+
+    const existingUser = await User.findOne({
+      email: normalizedEmail,
+    });
 
     if (existingUser) {
       return res.status(409).json({
@@ -28,9 +33,9 @@ router.post("/register", async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const user = await User.create({
-      fullName,
-      email,
-      phone,
+      fullName: fullName.trim(),
+      email: normalizedEmail,
+      phone: phone.trim(),
       password: hashedPassword,
     });
 
@@ -53,7 +58,7 @@ router.post("/register", async (req, res) => {
 });
 
 // ==============================
-// LOGIN USER
+// LOGIN USER + JWT
 // ==============================
 router.post("/login", async (req, res) => {
   try {
@@ -89,9 +94,27 @@ router.post("/login", async (req, res) => {
       });
     }
 
+    // ==============================
+    // GENERATE JWT TOKEN
+    // ==============================
+
+    const token = jwt.sign(
+      {
+        userId: user._id.toString(),
+        email: user.email,
+      },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "7d",
+      }
+    );
+
     // Login successful
     res.status(200).json({
       message: "Login successful.",
+
+      token,
+
       user: {
         id: user._id,
         fullName: user.fullName,
@@ -107,6 +130,7 @@ router.post("/login", async (req, res) => {
     });
   }
 });
+
 // ==============================
 // UPDATE USER PROFILE
 // ==============================
@@ -161,4 +185,5 @@ router.put("/profile/:id", async (req, res) => {
     });
   }
 });
+
 module.exports = router;
